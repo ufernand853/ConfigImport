@@ -33,9 +33,11 @@ namespace ConfigImport
             }
 
             var user = args[0];
+
             var folder = args.Length > 1
                 ? args[1]
                 : config["JsonFolder"] ?? Directory.GetCurrentDirectory();
+
 
             Trace.WriteLine($"Starting import for user {user} from folder {folder}");
             Import(connectionString, user, folder);
