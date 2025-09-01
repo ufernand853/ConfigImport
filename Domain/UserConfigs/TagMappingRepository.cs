@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -17,6 +18,7 @@ namespace ConfigImport.Domain.UserConfigs
 
         public Dictionary<string, Dictionary<string, TagMappingEntry>> Load(string user)
         {
+            Trace.WriteLine($"Loading tag mappings for user {user}");
             const string sql = "SELECT FormName, ElementId, TagValue, TagEstado FROM dbo.TagMappings WHERE UserName = @UserName";
             using var connection = new SqlConnection(_connectionString);
             var rows = connection.Query(sql, new { UserName = user });
@@ -45,6 +47,7 @@ namespace ConfigImport.Domain.UserConfigs
 
         public void Save(string user, Dictionary<string, Dictionary<string, TagMappingEntry>> data)
         {
+            Trace.WriteLine($"Saving tag mappings for user {user}");
             const string deleteSql = "DELETE FROM dbo.TagMappings WHERE UserName = @UserName";
             const string insertSql = "INSERT INTO dbo.TagMappings (UserName, FormName, ElementId, TagValue, TagEstado) VALUES (@UserName, @FormName, @ElementId, @TagValue, @TagEstado)";
 
@@ -71,6 +74,7 @@ namespace ConfigImport.Domain.UserConfigs
             }
 
             tx.Commit();
+            Trace.WriteLine("Tag mappings saved");
 
         }
     }

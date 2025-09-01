@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Diagnostics;
 
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -17,6 +17,7 @@ namespace ConfigImport.Domain.UserConfigs
 
         public Dictionary<string, Dictionary<string, string>> Load(string user)
         {
+            Trace.WriteLine($"Loading image mappings for user {user}");
 
             const string sql = "SELECT FormName, ElementId, ImagePath FROM dbo.ImageMappings WHERE UserName = @UserName";
             using var connection = new SqlConnection(_connectionString);
@@ -42,6 +43,7 @@ namespace ConfigImport.Domain.UserConfigs
 
         public void Save(string user, Dictionary<string, Dictionary<string, string>> data)
         {
+            Trace.WriteLine($"Saving image mappings for user {user}");
 
             const string deleteSql = "DELETE FROM dbo.ImageMappings WHERE UserName = @UserName";
             const string insertSql = "INSERT INTO dbo.ImageMappings (UserName, FormName, ElementId, ImagePath) VALUES (@UserName, @FormName, @ElementId, @ImagePath)";
@@ -66,6 +68,7 @@ namespace ConfigImport.Domain.UserConfigs
             }
 
             tx.Commit();
+            Trace.WriteLine("Image mappings saved");
 
         }
     }
