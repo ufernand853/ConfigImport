@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -16,6 +17,7 @@ namespace ConfigImport.Domain.UserConfigs
 
         public Dictionary<string, List<short>> Load(string user)
         {
+            Trace.WriteLine($"Loading graphs configuration for user {user}");
             const string sql = "SELECT GraphUid, VariableId FROM dbo.GraphsConfig WHERE UserName = @UserName";
             using var connection = new SqlConnection(_connectionString);
             var rows = connection.Query(sql, new { UserName = user });
@@ -39,6 +41,7 @@ namespace ConfigImport.Domain.UserConfigs
 
         public void Save(string user, Dictionary<string, List<short>> data)
         {
+            Trace.WriteLine($"Saving graphs configuration for user {user}");
 
             const string deleteSql = "DELETE FROM dbo.GraphsConfig WHERE UserName = @UserName";
             const string insertSql = "INSERT INTO dbo.GraphsConfig (UserName, GraphUid, VariableId) VALUES (@UserName, @GraphUid, @VariableId)";
@@ -62,6 +65,7 @@ namespace ConfigImport.Domain.UserConfigs
             }
 
             tx.Commit();
+            Trace.WriteLine("Graphs configuration saved");
 
         }
     }
