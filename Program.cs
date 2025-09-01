@@ -14,34 +14,43 @@ namespace ConfigImport
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
 
-            var config = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false)
-                .Build();
+            Trace.AutoFlush = true;
 
-            var connectionString = config.GetConnectionString("DefaultConnection");
-            if (string.IsNullOrEmpty(connectionString))
+            try
             {
-                Console.WriteLine("Connection string not found in configuration.");
-                return;
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(AppContext.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: false)
+                    .Build();
+
+                var connectionString = config.GetConnectionString("DefaultConnection");
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    Console.WriteLine("Connection string not found in configuration.");
+                    return;
+                }
+
+                if (args.Length < 1)
+                {
+                    Console.WriteLine("Usage: dotnet run --project ConfigImport -- <user> [configFolder]");
+                    return;
+                }
+
+                var user = args[0];
+                var folder = args.Length > 1
+                    ? args[1]
+                    : config["JsonFolder"] ?? Directory.GetCurrentDirectory();
+
+                Trace.WriteLine($"Starting import for user {user} from folder {folder}");
+                Import(connectionString, user, folder);
+                Trace.WriteLine("Import completed.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                Trace.WriteLine($"Error: {ex}");
             }
 
-            if (args.Length < 1)
-            {
-                Console.WriteLine("Usage: dotnet run --project ConfigImport -- <user> [configFolder]");
-                return;
-            }
-
-            var user = args[0];
-
-            var folder = args.Length > 1
-                ? args[1]
-                : config["JsonFolder"] ?? Directory.GetCurrentDirectory();
-
-
-            Trace.WriteLine($"Starting import for user {user} from folder {folder}");
-            Import(connectionString, user, folder);
-            Trace.WriteLine("Import completed.");
         }
 
         private static void Import(string connectionString, string user, string folder)
