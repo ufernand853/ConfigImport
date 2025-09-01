@@ -13,6 +13,7 @@ namespace ConfigImport
         public static void Main(string[] args)
         {
             Trace.Listeners.Add(new ConsoleTraceListener());
+
             Trace.AutoFlush = true;
 
             try
@@ -49,6 +50,7 @@ namespace ConfigImport
                 Console.WriteLine($"Error: {ex.Message}");
                 Trace.WriteLine($"Error: {ex}");
             }
+
         }
 
         private static void Import(string connectionString, string user, string folder)
